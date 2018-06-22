@@ -9,12 +9,6 @@ import (
 	"googlemaps.github.io/maps"
 )
 
-// var mapsClient maps.Client
-
-// func directionsAPICall(req maps.DirectionsRequest) ([]maps.Route, []maps.GeocodedWaypoint, error)  {
-//
-// }
-
 func timeToGoHandler(w http.ResponseWriter, req *http.Request) {
 
   w.WriteHeader(http.StatusOK)
@@ -26,30 +20,34 @@ func timeToGoHandler(w http.ResponseWriter, req *http.Request) {
   if err != nil {
     log.Panicf("error parsing form: %s", err)
   }
-  log.Printf("from = %s to = %s", req.Form.Get("from"), req.Form.Get("to") )
+  log.Printf("from = %s to = %s departure time = %s", req.Form.Get("from"), req.Form.Get("to"), req.Form.Get("departureTime") )
 
-  dirReq := &maps.DirectionsRequest{
+  dirReq := &maps.DirectionsRequest {
 		Origin:      req.Form.Get("from"),
 		Destination: req.Form.Get("to"),
-	}
+    DepartureTime: req.Form.Get("departureTime"),
+    Mode: maps.TravelModeDriving,
+  }
 
   mapsClient, err := maps.NewClient(maps.WithAPIKey("AIzaSyAFgh1pAQpS59mEwuViE2ExOw7M_W-2rzQ"))
   if err != nil {
-	 	log.Fatalf("fatal error: %s", err)
-	}
+    log.Fatalf("fatal error: %s", err)
+  }
 
 	routes, wayPoints, err := mapsClient.Directions(context.Background(), dirReq)
 	if err != nil {
 		log.Fatalf("fatal error: %s", err)
 	}
 
-  w.Write([]byte(pretty.Sprint(routes, wayPoints)))
+  for key := range routes {
+    w.Write([]byte(pretty.Sprint(routes[key])))
+  }
+
+  w.Write([]byte(pretty.Sprint(wayPoints)))
 
 }
 
 func main() {
-
   http.HandleFunc("/getTimeToGo", timeToGoHandler)
   http.ListenAndServe(":1313", nil)
-
 }
