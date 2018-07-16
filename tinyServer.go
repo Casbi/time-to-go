@@ -41,21 +41,31 @@ func timeToGoHandler(w http.ResponseWriter, req *http.Request) {
 		Mode:          maps.TravelModeDriving,
 	}
 
-	departureTime, err := strconv.ParseInt(dirReq.DepartureTime, 10, 64)
-	if err != nil {
-		log.Printf("error parsing departure time from string to int64: %s", err)
+	if dirReq.DepartureTime != "" {
+		departureTime, err := strconv.ParseInt(dirReq.DepartureTime, 10, 64)
+		if err != nil {
+			log.Printf("error parsing departure time from string to int64: %s", err)
+		} else {
+			thisTrip.departureTime = time.Unix(departureTime, 0)
+			fmt.Fprintf(w, "Trip departureTime: %v\n", thisTrip.departureTime)
+		}
 	} else {
-		thisTrip.departureTime = time.Unix(departureTime, 0)
-		fmt.Fprintf(w, "Trip departureTime: %v\n", thisTrip.departureTime)
+		if dirReq.ArrivalTime == "" {
+			log.Printf("Both departureTime and arrivalTime is nil")
+		}
+
+		arrivalTime, err := strconv.ParseInt(dirReq.ArrivalTime, 10, 64)
+		if err != nil {
+			log.Printf("error parsing arrival time from string to int64: %s", err)
+		} else {
+			thisTrip.arrivalTime = time.Unix(arrivalTime, 0)
+			fmt.Fprintf(w, "Trip arrivalTime: %v\n", thisTrip.arrivalTime)
+		}
 	}
 
-	arrivalTime, err := strconv.ParseInt(dirReq.ArrivalTime, 10, 64)
-	if err != nil {
-		log.Printf("error parsing arrival time from string to int64: %s", err)
-	} else {
-		thisTrip.arrivalTime = time.Unix(arrivalTime, 0)
-		fmt.Fprintf(w, "Trip arrivalTime: %v\n", thisTrip.arrivalTime)
-	}
+
+
+
 
 	mapsClient, err := maps.NewClient(maps.WithAPIKey("AIzaSyAFgh1pAQpS59mEwuViE2ExOw7M_W-2rzQ"))
 	if err != nil {
