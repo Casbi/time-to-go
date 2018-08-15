@@ -7,12 +7,13 @@ import (
 	"strconv"
 	"time"
 	"encoding/json"
+	"os"
 
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
 )
 
-const googleMapAPIKey = ""
+var googleMapAPIKey = os.Getenv("googleMapAPIKey")
 
 type trip struct {
 	DepartureTime          time.Time
