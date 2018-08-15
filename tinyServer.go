@@ -12,7 +12,7 @@ import (
 	"googlemaps.github.io/maps"
 )
 
-const googleMapAPIKey = "AIzaSyAFgh1pAQpS59mEwuViE2ExOw7M_W-2rzQ"
+const googleMapAPIKey = ""
 
 type trip struct {
 	DepartureTime          time.Time
