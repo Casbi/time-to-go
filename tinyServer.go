@@ -11,14 +11,17 @@ import (
 
 	"golang.org/x/net/context"
 	"googlemaps.github.io/maps"
+	// "google.golang.org/genproto/googleapis/type/latlng"
 )
 
 var googleMapAPIKey = os.Getenv("googleMapAPIKey")
 
 type trip struct {
-	DepartureTime          time.Time
-	ArrivalTime            time.Time
-	TotalDurationInTraffic time.Duration
+	DepartureTime          	time.Time
+	ArrivalTime            	time.Time
+	TotalDurationInTraffic 	time.Duration
+	OriginLatLng						maps.LatLng
+	DestinationLatLng 			maps.LatLng
 }
 
 func getTripFromAPI(req *http.Request) trip {
@@ -56,6 +59,12 @@ func getTripFromAPI(req *http.Request) trip {
 		for i := range routes {
 			for j := range routes[i].Legs {
 				thisTrip.TotalDurationInTraffic += routes[i].Legs[j].DurationInTraffic
+				if (i == 0 && j == 0) {
+					thisTrip.OriginLatLng = routes[i].Legs[j].StartLocation
+				}
+				if (i == len(routes)-1 && j == len(routes[i].Legs)-1) {
+					thisTrip.DestinationLatLng = routes[i].Legs[j].EndLocation
+				}
 			}
 		}
 		thisTrip.ArrivalTime = thisTrip.DepartureTime
